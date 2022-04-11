@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>BIG TIMER</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anek+Odia:wght@100;700&display=swap');
+
+        * {
+            font-weight: 100;
+            font-family: "Anek Odia", sans-serif;
+        }
+
+        body {
+            margin: auto;
+            background-color: #181818;
+            width: max-content;
+            color: #eee;
+        }
+
+        #wrapper {
+            text-align: center
+        }
+
+        h1 {
+            font-size: 4em;
+            margin: 0;
+            padding: 0;
+            font-family: "Anek Odia", sans-serif;
+        }
+
+        label {
+            font-family: "Anek Odia", sans-serif;
+        }
+
+        input {
+            background-color: #181818;
+            border: none;
+            text-align: center;
+            font-size: 6em;
+            color: #ddd;
+            margin-right: -.2ch;
+            width: 2ch;
+        }
+
+        #bodWrapper {
+            text-align: center;
+            margin: auto;
+            margin-top: 6ch;
+        }
+
+        #bodWrapper:hover {
+            border-bottom: 1px solid #eee;
+        }
+
+        #mWrapper,
+        #sWrapper {
+            display: inline;
+            margin-right: 3ch;
+        }
+
+        #seconds {
+            margin-right: -.3ch;
+        }
+
+        input::placeholder {
+            color: #ddd
+        }
+
+        #mUnit,
+        #sUnit {
+            font-size: 3.5em;
+            width: 1ch;
+            color: #aad;
+        }
+
+
+        #start {
+            font-size: 3.5em;
+            width: 5ch;
+            height: 5ch;
+            line-height: 5.35ch;
+            margin-top: 2ch;
+            background-color: #aad;
+            border: 3px solid #aad;
+            color: #181818;
+            font-weight: 700;
+        }
+
+        #start:hover {
+            background-color: #181818;
+            color: #aad;
+        }
+    </style>
+</head>
+
+<body onload="OnLoad()">
+    <div id="wrapper">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <h1 id="title">Timer</h1>
+        <div id="bodWrapper">
+            <div id="mWrapper">
+                <input type="text" pattern="[0-9]" name="minutes" id="minutes" placeholder="0">
+                <label id="mUnit" for="minutes">m</label>
+            </div>
+            <div id="sWrapper">
+                <input type="text" pattern="[0-9]" id="seconds" placeholder="00">
+                <label id="mUnit" for="seconds">s</label>
+            </div>
+        </div>
+        <button id="start" onclick="Start()">Start</button>
+    </div>
+    <script>
+        const minutes = document.getElementById('minutes')
+        const seconds = document.getElementById('seconds')
+        const start = document.getElementById('start')
+        const title = document.getElementById('title')
+        const AUTO_START_TIMEOUT = 1000
+        const audio = new Audio('beep.mp3')
+        audio.loop = true
+
+        let timer = null
+        let userInputTimeout = null
+
+        function clearInputs() {
+            minutes.value = ""
+            seconds.value = ""
+        }
+
+        function OnLoad() {
+            const params = new URLSearchParams(window.location.search) //On récupère les arguments GET
+            if (params.has('name')) {
+                title.textContent = params.get('name')
+            }
+            if (params.has('time') || params.has('t')) {
+                const time = parseInt(params.get('time') || params.get('t'))
+                minutes.value = parseInt(time / 60) //On parseInt à nouveau pour éviter les nombres à virgule
+                seconds.value = parseInt(time % 60)
+                startTimer()
+            }else{
+                //seconds.focus() //On focus sur le secondes au chargement si celles-ci sont vides
+            }
+            setSize(minutes)
+            setSize(seconds)
+        }
+
+        function setSize(x) {
+            let placeholder = x.getAttribute('placeholder').length;
+            x.style.width = (Math.max(x.value.length, placeholder) + 1) + 'ch'
+        }
+
+        function startTimer() {
+            if (seconds.value || minutes.value) //On ne démarre pas si le temps est égal à 0
+            {
+                seconds.blur()
+                timer = clearInterval(timer)
+                timer = setInterval(tick, 1000)
+                start.textContent = "Stop"
+            }
+        }
+
+        function stopTimer(aborted = false) {
+            if (!aborted)
+                audio.play()
+            timer = clearInterval(timer)
+        }
+
+        function isTimerDone() {
+            const nbSec = parseInt(seconds.value)
+            const nbMin = parseInt(minutes.value)
+            return ((nbSec <= 0 || isNaN(nbSec)) && (nbMin <= 0 || isNaN(nbMin)))
+        }
+
+
+        function tick() {
+            if(start.value === "Start")
+                return
+
+            if (parseInt(seconds.value) > 0) {
+                seconds.value = parseInt(seconds.value) - 1
+            } else if (parseInt(minutes.value) > 0) {
+                minutes.value = parseInt(minutes.value) - 1
+                seconds.value = 59
+            }
+
+            if (isTimerDone()) { //On check après les calculs, afin que le timer sonne directement lorsque 00 est atteint, au lieu d'atteindre un tick de plus
+                stopTimer()
+            }
+            document.title = minutes.value + ':' + seconds.value
+        }
+
+        start.onclick = function () {
+            if (this.textContent === "Start") {
+                startTimer()
+            } else { //Le bouton stop est aussi utilisé pour arrêter de jouer le son
+                stopTimer()
+                audio.pause();
+                audio.currentTime = 0;
+                this.textContent = "Start"
+            }
+        }
+
+        minutes.onfocus = () => seconds.focus();
+        seconds.onfocus = function(){ stopTimer(true);clearInputs()}
+            seconds.onkeydown = function (e) {
+                if (e.key === "Backspace") {
+                    if (minutes.value.length > 0) {
+                        seconds.value = minutes.value.slice(-1) + seconds.value;
+                        minutes.value = minutes.value.slice(0, -1);
+                    }
+                } else if (timer) //Si un timer est déjà démarré et que l'utilisateur réecrit, on vide les valuers actuelles
+                {
+                    clearInputs()
+                    stopTimer(true)
+                }
+            }
+
+        seconds.oninput = function () {
+            if (userInputTimeout)
+                clearTimeout(userInputTimeout)
+
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value > 60) { //Si la valeur est plus grande que 60, on bouge le nombre significatif dans les minutes
+                minutes.value += this.value.slice(0, 1)
+                this.value = this.value.slice(1)
+            } else if (seconds.value.length > 2) {
+                minutes.value += seconds.value.slice(0, -2);
+                seconds.value = seconds.value.slice(-2);
+            }
+
+            setSize(minutes)
+            setSize(seconds)
+            userInputTimeout = setTimeout(function () { startTimer(); tick() }, AUTO_START_TIMEOUT) //Démarre le timer automatiquement après 2.5 secondes sans input
+        }
+
+        seconds.onblur = startTimer
+    </script>
+</body>
+
+</html>
