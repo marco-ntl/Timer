@@ -13,10 +13,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Anek+Odia:wght@100;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Anek+Odia:wght@200;700&display=swap');
 
         * {
-            font-weight: 100;
+            font-weight: 200;
             font-family: "Anek Odia", sans-serif;
         }
 
@@ -173,7 +173,6 @@
         function stopTimer(aborted = false) {
             if (!aborted) {
                 audio.play()
-                clearInputs()
             }
             timer = clearInterval(timer)
         }
@@ -197,6 +196,7 @@
             }
 
             if (isTimerDone()) { //On check après les calculs, afin que le timer sonne directement lorsque 00 est atteint, au lieu d'atteindre un tick de plus
+                clearInputs()
                 stopTimer()
             }
             document.title = minutes.value + ':' + seconds.value
@@ -233,10 +233,10 @@
                 clearTimeout(userInputTimeout)
 
             this.value = this.value.replace(/[^0-9]/g, '');
-            if(minutes.value?.length <= 0 && this.value?.length == 1 && parseInt(this.value) > 6){ //Si le premier chiffre que l'utilisateur entre est plus grand que 6, c'est que celui-ci représente forcément un nombre de minutes
+            if (minutes.value?.length <= 0 && this.value?.length == 1 && parseInt(this.value) > 6) { //Si le premier chiffre que l'utilisateur entre est plus grand que 6, c'est que celui-ci représente forcément un nombre de minutes
                 minutes.value = this.value
                 this.value = ''
-            }else if (this.value > 60) { //Si la valeur est plus grande que 60, on bouge le nombre significatif dans les minutes
+            } else if (this.value > 60) { //Si la valeur est plus grande que 60, on bouge le nombre significatif dans les minutes
                 minutes.value += this.value.slice(0, 1)
                 this.value = this.value.slice(1)
             } else if (seconds.value.length > 2) {
