@@ -204,7 +204,9 @@
 
         start.onclick = function () {
             if (this.textContent === "Start") {
+                clearInterval(userInputTimeout)
                 startTimer()
+                tick()
             } else { //Le bouton stop est aussi utilisé pour arrêter de jouer le son
                 stopTimer()
                 audio.pause();
