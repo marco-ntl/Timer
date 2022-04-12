@@ -148,8 +148,8 @@
                 minutes.value = parseInt(time / 60) //On parseInt à nouveau pour éviter les nombres à virgule
                 seconds.value = parseInt(time % 60)
                 startTimer()
-            }else{
-                seconds.focus() //On focus sur le secondes au chargement si celles-ci sont vides
+            } else {
+                //seconds.focus() //On focus sur le secondes au chargement si celles-ci sont vides
             }
             setSize(minutes)
             setSize(seconds)
@@ -171,7 +171,7 @@
         }
 
         function stopTimer(aborted = false) {
-            if (!aborted){
+            if (!aborted) {
                 audio.play()
                 clearInputs()
             }
@@ -186,7 +186,7 @@
 
 
         function tick() {
-            if(start.value === "Start")
+            if (start.value === "Start")
                 return
 
             if (parseInt(seconds.value) > 0) {
@@ -214,26 +214,29 @@
         }
 
         minutes.onfocus = () => seconds.focus();
-        seconds.onfocus = function(){ stopTimer(true);clearInputs()}
-            seconds.onkeydown = function (e) {
-                if (e.key === "Backspace") {
-                    if (minutes.value.length > 0) {
-                        seconds.value = minutes.value.slice(-1) + seconds.value;
-                        minutes.value = minutes.value.slice(0, -1);
-                    }
-                } else if (timer) //Si un timer est déjà démarré et que l'utilisateur réecrit, on vide les valuers actuelles
-                {
-                    clearInputs()
-                    stopTimer(true)
+        seconds.onfocus = function () { stopTimer(true); clearInputs() }
+        seconds.onkeydown = function (e) {
+            if (e.key === "Backspace") {
+                if (minutes.value.length > 0) {
+                    seconds.value = minutes.value.slice(-1) + seconds.value;
+                    minutes.value = minutes.value.slice(0, -1);
                 }
+            } else if (timer) //Si un timer est déjà démarré et que l'utilisateur réecrit, on vide les valuers actuelles
+            {
+                clearInputs()
+                stopTimer(true)
             }
+        }
 
         seconds.oninput = function () {
             if (userInputTimeout)
                 clearTimeout(userInputTimeout)
 
             this.value = this.value.replace(/[^0-9]/g, '');
-            if (this.value > 60) { //Si la valeur est plus grande que 60, on bouge le nombre significatif dans les minutes
+            if(minutes.value?.length <= 0 && this.value?.length == 1 && parseInt(this.value) > 6){ //Si le premier chiffre que l'utilisateur entre est plus grand que 6, c'est que celui-ci représente forcément un nombre de minutes
+                minutes.value = this.value
+                this.value = ''
+            }else if (this.value > 60) { //Si la valeur est plus grande que 60, on bouge le nombre significatif dans les minutes
                 minutes.value += this.value.slice(0, 1)
                 this.value = this.value.slice(1)
             } else if (seconds.value.length > 2) {
