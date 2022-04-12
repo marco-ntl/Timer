@@ -14,9 +14,9 @@ The actual timer logic is contained in index.html, and the alarm sound is in bee
 ## UX
 Simply write the time in the format mmss (Eg. 5m30s -> 530).
 
-The timer starts by itself after a second of inactivity or if the time is set through URL arguments
+The timer starts by itself after a second of inactivity
 
-If the first input is bigger than 6, the timer assumes it's supposed to be a number of minutes (Eg. if you type "8", the timer will automatically be at 8m00s)
+If the first input is bigger than 6, the timer assumes it's supposed to be a number of minutes (Eg. if you type "8", the timer will automatically set itself at 8m00s)
 ## Premade timers with url arguments
 
 There's *two* arguments you can specify through the url :
